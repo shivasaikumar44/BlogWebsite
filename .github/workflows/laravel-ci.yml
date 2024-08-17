@@ -12,12 +12,17 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: Abc123
+          MYSQL_DATABASE: blog_website
+          MYSQL_USER: Krishna
+          MYSQL_PASSWORD: Abc123
         ports:
           - 3306:3306
+        healthcheck:
+          test: ["CMD-SHELL", "mysql -h localhost -u Krishna -pAbc123 -e 'SELECT 1'"]
+          interval: 10s
+          timeout: 30s
+          retries: 3
 
     steps:
       - name: Checkout code
@@ -40,9 +45,15 @@ jobs:
           echo "DB_CONNECTION=mysql" >> .env
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_PORT=3306" >> .env
-          echo "DB_DATABASE=test" >> .env
-          echo "DB_USERNAME=root" >> .env
-          echo "DB_PASSWORD=root" >> .env
+          echo "DB_DATABASE=blog_website" >> .env
+          echo "DB_USERNAME=Krishna" >> .env
+          echo "DB_PASSWORD=Abc123" >> .env
+
+      - name: Wait for MySQL
+        run: |
+          while ! mysql -h 127.0.0.1 -u Krishna -pAbc123 -e 'SELECT 1'; do
+            sleep 1
+          done
 
       - name: Get composer cache directory
         id: composer-cache
