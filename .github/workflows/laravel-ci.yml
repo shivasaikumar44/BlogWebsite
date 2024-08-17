@@ -26,6 +26,12 @@ jobs:
           echo "APP_KEY=" >> .env
           echo "APP_DEBUG=true" >> .env
           echo "APP_URL=http://localhost" >> .env
+          echo "DB_CONNECTION=mysql" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "DB_DATABASE=test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=" >> .env
 
       - name: Get composer cache directory
         id: composer-cache
@@ -51,7 +57,8 @@ jobs:
           php artisan config:cache
           php artisan storage:link
           php artisan optimize:clear
-          php artisan migrate  # Run migrations (if needed)
+          php artisan migrate  # Run migrations
+          php artisan db:seed --class=DatabaseSeeder  # Optional: run database seeder
 
       - name: Run Laravel Application
         run: php artisan serve --no-reload  # Run the application without reloading
