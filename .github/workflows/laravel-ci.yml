@@ -68,14 +68,16 @@ jobs:
           composer install --no-dev --prefer-dist --optimize-autoloader
           composer dump-autoload -o
 
+    
       - name: Prepare Laravel Application
         run: |
           php artisan key:generate
+          php artisan migrate  # Run migrations before caching
+          php artisan db:seed --class=DatabaseSeeder  # Optional: run database seeder
           php artisan config:cache
           php artisan storage:link
           php artisan optimize:clear
-          php artisan migrate  # Run migrations
-          php artisan db:seed --class=DatabaseSeeder  # Optional: run database seeder
+
 
       - name: Run Laravel Application
         run: php artisan serve --no-reload
