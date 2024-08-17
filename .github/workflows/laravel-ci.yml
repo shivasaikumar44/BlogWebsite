@@ -80,8 +80,7 @@ jobs:
       # - name: Run Laravel Application
       #   run: php artisan serve --no-reload
 
-      - name: Test Deployment
+      - name: Run Tests
         run: |
-          # Example test command - replace with your actual tests
-          curl -I http://localhost:8000 || exit 1
+          vendor/bin/phpunit --testdox
 
