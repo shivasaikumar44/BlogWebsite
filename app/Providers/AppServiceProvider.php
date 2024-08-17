@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Faker\Factory as FakerFactory;
 
-class AppServiceProvider extends ServiceProvider
+class DatabaseServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -14,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Bind Faker to the service container
+        // Binding Faker to the service container
         $this->app->singleton('Faker', function ($app) {
             return FakerFactory::create();
         });
@@ -22,8 +22,10 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
+     *
+     * @return void
      */
-    public function boot(): void
+    public function boot()
     {
         //
     }
