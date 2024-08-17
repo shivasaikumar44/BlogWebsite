@@ -8,6 +8,17 @@ on:
 jobs:
   laravel:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+        ports:
+          - 3306:3306
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,7 +26,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2.12'  # Use a more recent and stable PHP version
+          php-version: '8.2.12'
           extensions: mysql
           coverage: xdebug
 
@@ -31,7 +42,7 @@ jobs:
           echo "DB_PORT=3306" >> .env
           echo "DB_DATABASE=test" >> .env
           echo "DB_USERNAME=root" >> .env
-          echo "DB_PASSWORD=" >> .env
+          echo "DB_PASSWORD=root" >> .env
 
       - name: Get composer cache directory
         id: composer-cache
@@ -49,7 +60,7 @@ jobs:
       - name: Install Composer dependencies
         run: |
           composer install --no-dev --prefer-dist --optimize-autoloader
-          composer dump-autoload -o  # Optimize autoloading
+          composer dump-autoload -o
 
       - name: Prepare Laravel Application
         run: |
@@ -61,4 +72,4 @@ jobs:
           php artisan db:seed --class=DatabaseSeeder  # Optional: run database seeder
 
       - name: Run Laravel Application
-        run: php artisan serve --no-reload  # Run the application without reloading
+        run: php artisan serve --no-reload
