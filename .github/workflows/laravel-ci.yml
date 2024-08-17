@@ -11,28 +11,39 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '11.20.0'
+          php-version: '11.20.0'  # Use a more recent and stable PHP version
           extensions: mysql
           coverage: xdebug
+
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        run: |
+          echo "dir=$(composer config cache-files-dir)"
+          echo "##[set-output name=cache-dir;]$dir"
+
       - name: Cache composer dependencies
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ steps.composer-cache.outputs.cache-dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
+
       - name: Install Composer dependencies
-        run: composer install --no-progress --prefer-dist --optimize-autoloader
+        run: |
+          composer install --no-dev --prefer-dist --optimize-autoloader
+          composer dump-autoload -o  # Optimize autoloading
+
       - name: Prepare Laravel Application
         run: |
           php artisan key:generate
           php artisan config:cache
           php artisan storage:link
           php artisan optimize:clear
+          php artisan migrate  # Run migrations (if needed)
+
       - name: Run Laravel Application
-        run: php artisan serve
+        run: php artisan serve --no-reload  # Run the application without reloading
