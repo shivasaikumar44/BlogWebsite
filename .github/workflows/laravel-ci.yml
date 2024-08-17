@@ -77,6 +77,11 @@ jobs:
           php artisan storage:link
           php artisan optimize:clear
 
-      - name: Run Laravel Application
-        run: php artisan serve --no-reload
+      # - name: Run Laravel Application
+      #   run: php artisan serve --no-reload
+
+      - name: Test Deployment
+        run: |
+          # Example test command - replace with your actual tests
+          curl -I http://localhost:8000 || exit 1
 
