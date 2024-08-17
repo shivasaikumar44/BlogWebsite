@@ -1,3 +1,87 @@
+# name: Laravel Workflow
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   laravel:
+#     runs-on: ubuntu-latest
+#     services:
+#       mysql:
+#         image: mysql:8.0
+#         env:
+#           MYSQL_ROOT_PASSWORD: Abc123
+#           MYSQL_DATABASE: blog_website
+#           MYSQL_USER: Krishna
+#           MYSQL_PASSWORD: Abc123
+#         ports:
+#           - 3306:3306
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Setup PHP
+#         uses: shivammathur/setup-php@v2
+#         with:
+#           php-version: '8.2.12'
+#           extensions: mysql
+#           coverage: xdebug
+
+#       - name: Create .env file
+#         run: |
+#           touch .env
+#           echo "APP_ENV=local" >> .env
+#           echo "APP_KEY=" >> .env
+#           echo "APP_DEBUG=true" >> .env
+#           echo "APP_URL=http://localhost" >> .env
+#           echo "DB_CONNECTION=mysql" >> .env
+#           echo "DB_HOST=127.0.0.1" >> .env
+#           echo "DB_PORT=3306" >> .env
+#           echo "DB_DATABASE=blog_website" >> .env
+#           echo "DB_USERNAME=Krishna" >> .env
+#           echo "DB_PASSWORD=Abc123" >> .env
+
+#       - name: Wait for MySQL
+#         run: |
+#           until mysql -h 127.0.0.1 -u Krishna -pAbc123 -e 'SELECT 1'; do
+#             sleep 10
+#           done
+
+#       - name: Get composer cache directory
+#         id: composer-cache
+#         run: |
+#           echo "dir=$(composer config cache-files-dir)"
+#           echo "##[set-output name=cache-dir;]$dir"
+
+#       - name: Cache composer dependencies
+#         uses: actions/cache@v3
+#         with:
+#           path: ${{ steps.composer-cache.outputs.cache-dir }}
+#           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+#           restore-keys: ${{ runner.os }}-composer-
+
+#       - name: Install Composer dependencies
+#         run: |
+#           composer install --prefer-dist --optimize-autoloader
+#           composer dump-autoload -o
+
+#       - name: Prepare Laravel Application
+#         run: |
+#           php artisan key:generate
+#           php artisan migrate  # Run migrations before caching
+#           php artisan db:seed --class=DatabaseSeeder  # Optional: run database seeder
+#           php artisan config:cache
+#           php artisan storage:link
+#           php artisan optimize:clear
+
+#       # - name: Run Laravel Application
+#       #   run: php artisan serve --no-reload
+
+      
+
 name: Laravel Workflow
 
 on:
@@ -27,13 +111,13 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2.12'
-          extensions: mysql
+          extensions: mysql, mysqli, pdo_mysql
           coverage: xdebug
 
       - name: Create .env file
         run: |
-          touch .env
-          echo "APP_ENV=local" >> .env
+          cp .env.example .env
+          echo "APP_ENV=testing" >> .env
           echo "APP_KEY=" >> .env
           echo "APP_DEBUG=true" >> .env
           echo "APP_URL=http://localhost" >> .env
@@ -65,22 +149,18 @@ jobs:
 
       - name: Install Composer dependencies
         run: |
-          composer install --prefer-dist --optimize-autoloader
+          composer install --prefer-dist --no-dev --optimize-autoloader
           composer dump-autoload -o
 
       - name: Prepare Laravel Application
         run: |
           php artisan key:generate
-          php artisan migrate  # Run migrations before caching
-          php artisan db:seed --class=DatabaseSeeder  # Optional: run database seeder
+          php artisan migrate --force  # Run migrations before caching
+          php artisan db:seed --class=DatabaseSeeder --force  # Optional: run database seeder
           php artisan config:cache
           php artisan storage:link
           php artisan optimize:clear
 
-      # - name: Run Laravel Application
-      #   run: php artisan serve --no-reload
-
-      - name: Run Tests
+      - name: Run PHPUnit Tests
         run: |
-          vendor/bin/phpunit --testdox
-
+          vendor/bin/phpunit --configuration phpunit.xml
