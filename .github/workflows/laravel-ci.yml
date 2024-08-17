@@ -15,7 +15,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '11.20.0'  # Use a more recent and stable PHP version
+          php-version: '8.2.12'  # Use a more recent and stable PHP version
           extensions: mysql
           coverage: xdebug
 
