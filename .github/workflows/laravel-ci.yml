@@ -19,6 +19,14 @@ jobs:
           extensions: mysql
           coverage: xdebug
 
+      - name: Create .env file
+        run: |
+          touch .env
+          echo "APP_ENV=local" >> .env
+          echo "APP_KEY=" >> .env
+          echo "APP_DEBUG=true" >> .env
+          echo "APP_URL=http://localhost" >> .env
+
       - name: Get composer cache directory
         id: composer-cache
         run: |
