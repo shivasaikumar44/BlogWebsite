@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\blogController;
 
 
-
+Route::get('/', function () {
+    return view('welcome');
+});
 Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index'); // Display a list of all blogs posts
 Route::get('/blogs/create', [BlogController::class, 'create'])->name('blogs.create'); // Display a form to create a new blogs post
 Route::post('/blogs', [BlogController::class, 'store'])->name('blogs.store'); // Store a new blogs post
